@@ -4,3 +4,6 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 .idea
+Flights/TransportZone.Flights.Api/Logs
+Air/TransportZone.Air.Api/Logs
+Schedulers/TransportZone.Schedulers.Air.Api/Logs

@@ -1,0 +1,40 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TransportZone.Air.Infrastructure.Services";
+
+import "google/protobuf/timestamp.proto";
+
+package flights.protos;
+
+service FlightsService{
+  rpc GetFlight(GetFlightRequest) returns (GetFlightResponse);
+  rpc UpdateStatus(UpdateStatusRequest) returns (CommandResponse);
+}
+
+message GetFlightRequest{
+  int32 flightId = 1;
+}
+
+message GetFlightResponse{
+  int32 flightId = 1;
+  google.protobuf.Timestamp scheduledDeparture = 2;
+  string departureAirportId = 3;
+  string arrivalAirportId = 4;
+}
+
+message UpdateStatusRequest{
+  int32 flightId = 1;
+  FlightStatus status = 2;
+}
+message CommandResponse{
+  CommandStatus status = 1;
+  string errorReason = 2;
+}
+enum FlightStatus{
+  OnTime = 0;
+  Delayed = 1;
+}
+enum CommandStatus{
+  Error = 0;
+  Success = 1;
+}

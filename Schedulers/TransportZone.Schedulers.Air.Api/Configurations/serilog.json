@@ -1,0 +1,39 @@
+{
+  "Serilog": {
+    "Using": [],
+    "Enrich": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithProcessId",
+      "WithThreadId",
+      "WithHangfireContext"
+    ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Hangfire": "Warning",
+        "Quartz": "Information",
+        "MassTransit": "Information",
+        "Microsoft": "Error",
+        "Microsoft.Hosting.Lifetime": "Information",
+        "Microsoft.EntityFrameworkCore": "Warning",
+        "System": "Information"
+      }
+    },
+    "Properties": {
+      "Application": "Zhendehanyu"
+    },
+    "WriteTo": [
+      {
+        "Args": {
+          "path": "Logs/logs.json",
+          "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
+          "rollingInterval": "Day",
+          "restrictedToMinimumLevel": "Information",
+          "retainedFileCountLimit": 5
+        },
+        "Name": "File"
+      }
+    ]
+  }
+}

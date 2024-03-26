@@ -1,0 +1,69 @@
+version: "3.8"
+services:
+  zookeeper-local:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 30001
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 30001:30001
+    deploy:
+      replicas: 1
+
+  kafka-local:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper-local
+    ports:
+      - 29093:29093
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-local:30001
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-local:9093,PLAINTEXT_HOST://localhost:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry-local:8084
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    deploy:
+      replicas: 1
+  
+  schema-registry-local:
+    image: confluentinc/cp-schema-registry:latest
+    hostname: schema-registry-local
+    depends_on:
+      - kafka-local
+    ports:
+      - 8084:8084
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry-local
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-local:30001
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-local:9093
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8084
+    deploy:
+      replicas: 1
+  
+  kafka-ui-local:
+    image: provectuslabs/kafka-ui
+    container_name: kafka-ui-local
+    depends_on:
+      - zookeeper-local
+      - kafka-local
+    ports:
+      - 8083:8080
+    restart: always
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-local:9093
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper-local:30001
+    deploy:
+      replicas: 1
+
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5673:5672
+        - 15673:15672
+    restart: always
+    deploy:
+      replicas: 1
